@@ -102,6 +102,8 @@ function inicia_jogo() {
     peca[7][6]['peca'] = "peao"; peca[7][6]['cor'] = "branco"; peca[7][6]['mov'] = 0;
     peca[7][7]['peca'] = "peao"; peca[7][7]['cor'] = "branco"; peca[7][7]['mov'] = 0;
     peca[7][8]['peca'] = "peao"; peca[7][8]['cor'] = "branco"; peca[7][8]['mov'] = 0;
+    console.log('peca: ', peca);
+    
 
     ///aray para movimentar as pecas
     movimenta = new Array();
@@ -117,7 +119,7 @@ function inicia_jogo() {
     movimenta['destino']['y'] = 0;
     movimenta['destino']['peca'] = "0";
     movimenta['destino']['cor'] = "0";
-
+    console.log('movimenta: ', movimenta);
     ///aray para os possiveis movimentos
     possiveis = new Array();
 }
