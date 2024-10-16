@@ -249,12 +249,15 @@ function volta_fundo() {
 }
 
 function verifica_possivel(x, y, c) {
+    console.log('verifica_possivel: ', x, y, c);
+    
     var pode = 0;
     var cp;
     var div = "t" + x + y;
 
     for (cp = 1; cp < c; cp++) {
-
+        console.log('possiveis[cp]: ', possiveis[cp]);
+        
         if (possiveis[cp] == div) {
             pode++;
         }
@@ -266,7 +269,6 @@ function verifica_possivel(x, y, c) {
 }
 
 function seleciona(x, y) {
-    cont_possiveis = 0;
     if ((movimenta['selecionada']['x'] == 0 || peca[x][y]['cor'] == movimenta['selecionada']['cor']) && peca[x][y]['cor'] == vez) {
         if (movimenta['selecionada']['x'] != 0) {
             volta_fundo(); //volta a cor de fundo normal
@@ -301,32 +303,31 @@ function seleciona(x, y) {
         }
 
         if (peca[x][y]['cor'] != movimenta['selecionada']['cor']) {
-            movimenta['destino']['x'] = x;	//recebe o x do destino(segundo clique)
+            movimenta['destino']['x'] = x; //recebe o x do destino(segundo clique)
             movimenta['destino']['y'] = y;  //recebe y do destino(segundo clique)
 
             if (peca[x][y]['peca']) {  //se tiver alguma peca nessa posição
-                movimenta['destino']['peca'] = peca[x][y]['peca'];	//destino recebe a peca selecionada
-                movimenta['destino']['cor'] = peca[x][y]['cor'];	//destino recebe a cor selecionada
+                movimenta['destino']['peca'] = peca[x][y]['peca']; //destino recebe a peca selecionada
+                movimenta['destino']['cor'] = peca[x][y]['cor']; //destino recebe a cor selecionada
             }
 
-            document.getElementById("t" + movimenta['selecionada']['x'] + "" + movimenta['selecionada']['y']).innerHTML = ""; //selcionada fica sem imagem
+            document.getElementById("t" + movimenta['selecionada']['x'] + "" + movimenta['selecionada']['y']).innerHTML = ""; //selecionada fica sem imagem
             document.getElementById("t" + x + "" + y).innerHTML = il[movimenta['selecionada']['cor']][movimenta['selecionada']['peca']]; //destino recebe a imagem da peça selecinada
-            peca[x][y]['peca'] = movimenta['selecionada']['peca'];	//posicao destino recebe a peca
-            peca[x][y]['cor'] = movimenta['selecionada']['cor'];		//posicao destino recebe a cor
+            peca[x][y]['peca'] = movimenta['selecionada']['peca']; //posicao destino recebe a peca
+            peca[x][y]['cor'] = movimenta['selecionada']['cor']; //posicao destino recebe a cor
 
-            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['peca'] = false;		//peca selecionada recebe 0
-            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['cor'] = false;		//cor selecionada recebe 0
+            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['peca'] = false; //peca selecionada recebe 0
+            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['cor'] = false; //cor selecionada recebe 0
 
-            movimenta['selecionada']['x'] = 0;	//selecionada x recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['y'] = 0;	//selecionada y recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['peca'] = "0";	//selecionada peca recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['cor'] = "0";	//selecionada cor recebe 0 (pra na proxima ver q é o primeiro movimento)
+            movimenta['selecionada']['x'] = 0; //selecionada x recebe 0 (pra na proxima ver q é o primeiro movimento)
+            movimenta['selecionada']['y'] = 0; //selecionada y recebe 0 (pra na proxima ver q é o primeiro movimento)
+            movimenta['selecionada']['peca'] = "0"; //selecionada peca recebe 0 (pra na proxima ver q é o primeiro movimento)
+            movimenta['selecionada']['cor'] = "0"; //selecionada cor recebe 0 (pra na proxima ver q é o primeiro movimento)
         }
 
         volta_fundo(); //volta a cor de fundo normal
 
         if (vez == "branco") { vez = "preto"; } else { vez = "branco"; } //troca a vez
-
     }
 }
 
