@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Chess.com 2</title>
+</head>
+
+<body onload="inicia_jogo();">
+  <div id="fundo"></div>
+  <div id="escolhecor-inicio" class="escolhe">
+    <div onclick="escolhecor_incio('branco');">&#9812;</div>
+    <div onclick="escolhecor_incio('preto');">&#9818;</div>
+  </div>
+  <div id="escolhebranco" class="escolhe">
+    <div onclick="escolhe('rainha','branco');">&#9813;</div>
+    <div onclick="escolhe('torre','branco');">&#9814;</div>
+    <div onclick="escolhe('cavalo','branco');">&#9816;</div>
+    <div onclick="escolhe('bispo','branco');">&#9815;</div>
+  </div>
+  <div id="escolhepreto" class="escolhe">
+    <div onclick="escolhe('rainha','preto');">&#9819;</div>
+    <div onclick="escolhe('torre','preto');">&#9820;</div>
+    <div onclick="escolhe('cavalo','preto');">&#9822;</div>
+    <div onclick="escolhe('bispo','preto');">&#9821;</div>
+  </div>
+
+  <div id="tabuleiro">
+    <div id="t11" class="casaTabuleiroBranca" onclick="seleciona(1,1);"></div>
+    <div id="t12" class="casaTabuleiroPreta" onclick="seleciona(1,2);"></div>
+    <div id="t13" class="casaTabuleiroBranca" onclick="seleciona(1,3);"></div>
+    <div id="t14" class="casaTabuleiroPreta" onclick="seleciona(1,4);"></div>
+    <div id="t15" class="casaTabuleiroBranca" onclick="seleciona(1,5);"></div>
+    <div id="t16" class="casaTabuleiroPreta" onclick="seleciona(1,6);"></div>
+    <div id="t17" class="casaTabuleiroBranca" onclick="seleciona(1,7);"></div>
+    <div id="t18" class="casaTabuleiroPreta" onclick="seleciona(1,8);"></div>
+
+    <div id="t21" class="casaTabuleiroPreta" onclick="seleciona(2,1);"></div>
+    <div id="t22" class="casaTabuleiroBranca" onclick="seleciona(2,2);"></div>
+    <div id="t23" class="casaTabuleiroPreta" onclick="seleciona(2,3);"></div>
+    <div id="t24" class="casaTabuleiroBranca" onclick="seleciona(2,4);"></div>
+    <div id="t25" class="casaTabuleiroPreta" onclick="seleciona(2,5);"></div>
+    <div id="t26" class="casaTabuleiroBranca" onclick="seleciona(2,6);"></div>
+    <div id="t27" class="casaTabuleiroPreta" onclick="seleciona(2,7);"></div>
+    <div id="t28" class="casaTabuleiroBranca" onclick="seleciona(2,8);"></div>
+
+    <div id="t31" class="casaTabuleiroBranca" onclick="seleciona(3,1);"></div>
+    <div id="t32" class="casaTabuleiroPreta" onclick="seleciona(3,2);"></div>
+    <div id="t33" class="casaTabuleiroBranca" onclick="seleciona(3,3);"></div>
+    <div id="t34" class="casaTabuleiroPreta" onclick="seleciona(3,4);"></div>
+    <div id="t35" class="casaTabuleiroBranca" onclick="seleciona(3,5);"></div>
+    <div id="t36" class="casaTabuleiroPreta" onclick="seleciona(3,6);"></div>
+    <div id="t37" class="casaTabuleiroBranca" onclick="seleciona(3,7);"></div>
+    <div id="t38" class="casaTabuleiroPreta" onclick="seleciona(3,8);"></div>
+
+    <div id="t41" class="casaTabuleiroPreta" onclick="seleciona(4,1);"></div>
+    <div id="t42" class="casaTabuleiroBranca" onclick="seleciona(4,2);"></div>
+    <div id="t43" class="casaTabuleiroPreta" onclick="seleciona(4,3);"></div>
+    <div id="t44" class="casaTabuleiroBranca" onclick="seleciona(4,4);"></div>
+    <div id="t45" class="casaTabuleiroPreta" onclick="seleciona(4,5);"></div>
+    <div id="t46" class="casaTabuleiroBranca" onclick="seleciona(4,6);"></div>
+    <div id="t47" class="casaTabuleiroPreta" onclick="seleciona(4,7);"></div>
+    <div id="t48" class="casaTabuleiroBranca" onclick="seleciona(4,8);"></div>
+
+    <div id="t51" class="casaTabuleiroBranca" onclick="seleciona(5,1);"></div>
+    <div id="t52" class="casaTabuleiroPreta" onclick="seleciona(5,2);"></div>
+    <div id="t53" class="casaTabuleiroBranca" onclick="seleciona(5,3);"></div>
+    <div id="t54" class="casaTabuleiroPreta" onclick="seleciona(5,4);"></div>
+    <div id="t55" class="casaTabuleiroBranca" onclick="seleciona(5,5);"></div>
+    <div id="t56" class="casaTabuleiroPreta" onclick="seleciona(5,6);"></div>
+    <div id="t57" class="casaTabuleiroBranca" onclick="seleciona(5,7);"></div>
+    <div id="t58" class="casaTabuleiroPreta" onclick="seleciona(5,8);"></div>
+
+    <div id="t61" class="casaTabuleiroPreta" onclick="seleciona(6,1);"></div>
+    <div id="t62" class="casaTabuleiroBranca" onclick="seleciona(6,2);"></div>
+    <div id="t63" class="casaTabuleiroPreta" onclick="seleciona(6,3);"></div>
+    <div id="t64" class="casaTabuleiroBranca" onclick="seleciona(6,4);"></div>
+    <div id="t65" class="casaTabuleiroPreta" onclick="seleciona(6,5);"></div>
+    <div id="t66" class="casaTabuleiroBranca" onclick="seleciona(6,6);"></div>
+    <div id="t67" class="casaTabuleiroPreta" onclick="seleciona(6,7);"></div>
+    <div id="t68" class="casaTabuleiroBranca" onclick="seleciona(6,8);"></div>
+
+    <div id="t71" class="casaTabuleiroBranca" onclick="seleciona(7,1);"></div>
+    <div id="t72" class="casaTabuleiroPreta" onclick="seleciona(7,2);"></div>
+    <div id="t73" class="casaTabuleiroBranca" onclick="seleciona(7,3);"></div>
+    <div id="t74" class="casaTabuleiroPreta" onclick="seleciona(7,4);"></div>
+    <div id="t75" class="casaTabuleiroBranca" onclick="seleciona(7,5);"></div>
+    <div id="t76" class="casaTabuleiroPreta" onclick="seleciona(7,6);"></div>
+    <div id="t77" class="casaTabuleiroBranca" onclick="seleciona(7,7);"></div>
+    <div id="t78" class="casaTabuleiroPreta" onclick="seleciona(7,8);"></div>
+
+    <div id="t81" class="casaTabuleiroPreta" onclick="seleciona(8,1);"></div>
+    <div id="t82" class="casaTabuleiroBranca" onclick="seleciona(8,2);"></div>
+    <div id="t83" class="casaTabuleiroPreta" onclick="seleciona(8,3);"></div>
+    <div id="t84" class="casaTabuleiroBranca" onclick="seleciona(8,4);"></div>
+    <div id="t85" class="casaTabuleiroPreta" onclick="seleciona(8,5);"></div>
+    <div id="t86" class="casaTabuleiroBranca" onclick="seleciona(8,6);"></div>
+    <div id="t87" class="casaTabuleiroPreta" onclick="seleciona(8,7);"></div>
+    <div id="t88" class="casaTabuleiroBranca" onclick="seleciona(8,8);"></div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

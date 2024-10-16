@@ -1,0 +1,89 @@
+@charset "utf-8";
+
+/* TABULEIRO*/
+#tabuleiro {
+    width: 577px;
+    height: 577px;
+    margin: auto;
+}
+
+#tabuleiro div {
+    width: 70px;
+    height: 70px;
+    float: left;
+    margin: 1px;
+    font-size: 48px;
+    text-align: center;
+}
+
+.casaTabuleiroBranca:hover,
+.casaTabuleiroPreta:hover {
+    transform: translate(5px, -5px);
+}
+
+.casaTabuleiroBranca,
+.casaTabuleiroPreta {
+    border-radius: 6px;
+    transition: .1s ease-in-out;
+}
+
+.casaTabuleiroBranca {
+    background-color: #999;
+}
+
+.casaTabuleiroPreta {
+    background-color: #fd4747;
+}
+
+div {
+    cursor: pointer;
+}
+
+
+#fundo {
+    background: #000;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    opacity: 0.50;
+    -moz-opacity: 0.50;
+    filter: alpha(opacity=50);
+}
+
+.escolhe {
+    position: fixed;
+    top: 20%;
+    left: 40%;
+    display: none;
+    z-index: 1000;
+    background: #FFF;
+    border: #000 solid 1px;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.escolhe div {
+    width: 70px;
+    height: 70px;
+    float: left;
+    margin: 1px;
+    font-size: 48px;
+    text-align: center;
+    float: left;
+    margin: 5px;
+    transition: .2s ease-in-out;
+    border-radius: 6px;
+}
+
+.escolhe div:hover {
+    background-color: #ccccccbb;
+    transform: translateY(-10px);
+}
+
+#escolhecor-inicio {
+    display: block;
+    left: 45%;
+}
