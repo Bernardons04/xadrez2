@@ -266,6 +266,7 @@ function verifica_possivel(x, y, c) {
 }
 
 function seleciona(x, y) {
+    cont_possiveis = 0;
     if ((movimenta['selecionada']['x'] == 0 || peca[x][y]['cor'] == movimenta['selecionada']['cor']) && peca[x][y]['cor'] == vez) {
         if (movimenta['selecionada']['x'] != 0) {
             volta_fundo(); //volta a cor de fundo normal
@@ -275,7 +276,8 @@ function seleciona(x, y) {
             movimenta['selecionada']['y'] = y;  //recebe y selecionado
             movimenta['selecionada']['peca'] = peca[x][y]['peca']; //recebe a peca selecionada
             movimenta['selecionada']['cor'] = peca[x][y]['cor'];	//recebe a cor selecionada
-
+            console.log('movimenta seleciona 1: ', movimenta);
+            
             cont_possiveis = possiveis_movimentos();
         }
 
@@ -286,7 +288,7 @@ function seleciona(x, y) {
 
         }
 
-        //Pra trocar de peça quando o peão chegar do outro lado
+        //Pra trocar de peça quando o peão chegar do outro lado (PROMOVER PEAO)
         if (movimenta['selecionada']['peca'] == 'peao' && movimenta['selecionada']['cor'] == 'branco' && x == 1) {
             document.getElementById('escolhebranco').style.display = 'block';
             document.getElementById('fundo').style.display = 'block';
