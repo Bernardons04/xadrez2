@@ -229,7 +229,7 @@ function possiveis_movimentos() {
         if (px > 0 && px < 9 && py > 0 && py < 9 && peca[px][py]['cor'] != movimenta['selecionada']['cor']) {
             document.getElementById('t' + (px) + (py)).style.backgroundColor = "#3C9"; //muda cor de fundo
             possiveis[c] = "t" + (px) + (py); c++;
-
+            
             if (!peca[px][py]['peca']) {
                 return true;
             }
@@ -256,8 +256,6 @@ function verifica_possivel(x, y, c) {
     var div = "t" + x + y;
 
     for (cp = 1; cp < c; cp++) {
-        console.log('possiveis[cp]: ', possiveis[cp]);
-        
         if (possiveis[cp] == div) {
             pode++;
         }
@@ -265,7 +263,6 @@ function verifica_possivel(x, y, c) {
             return 1;
         }
     }
-
 }
 
 function seleciona(x, y) {
@@ -281,13 +278,13 @@ function seleciona(x, y) {
             console.log('movimenta seleciona 1: ', movimenta);
             
             cont_possiveis = possiveis_movimentos();
+            
         }
 
     } else if (verifica_possivel(x, y, cont_possiveis)) { //se for segundo clique e a cor da peca destino for diferente da selecionada
 
         if (peca[x][y]['peca'] == "rei") {
             alert(movimenta['selecionada']['cor'] + " venceu (:");
-
         }
 
         //Pra trocar de peça quando o peão chegar do outro lado (PROMOVER PEAO)
