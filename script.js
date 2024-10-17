@@ -7,7 +7,6 @@
             sim: ótimo, continue o jogo;
             não, então é cheque mate
 
-
     1 - Detectar se o jogador 1 está em cheque, logo após a jogada do jogador 2, 
         e para isso é necessário verificar se alguma peça do jogador 1, está ameaçando o rei do jogador 2;
         1.1. IMPLEMENTAÇÃO: Depois de cada movimento, fazer uma iteração por todas as peças do oponente do jogador 2, para verificar se alguma delas
@@ -23,9 +22,6 @@
             como por exemplo: se o jogador em cheque for colocar uma peça entre o rei e a peça que está ameaçando o rei. Ou então se é possivel comer a peça que está ameaçando o rei, ou então simplesmente mover o rei;
 */
 
-
-
-
 /* Implementação para fazer o jogador perder por cheque-mate
     1 - É bem simples, caso algum jogador 1 esteja em cheque-mate, disparar um modal ou alert com uma mensagem de que o jogador 2
         venceu e um botão que vai reiniciar a partida;
@@ -34,13 +30,12 @@
         para que uma nova partida possa ser iniciada;
 */
 
-
-
 /* Detectar empate por afogamento */
 /* Captura en-passant */
 
 function inicia_jogo() {
     vez = "branco"; //vez de quem jogar
+    vezAdversaria = "preto"
 
     //muda a classe das pecas pretas(encima) para mostrar imgens das pecas
     document.getElementById("t11").innerHTML = "&#9820;";
@@ -143,8 +138,6 @@ function inicia_jogo() {
     peca[7][6]['peca'] = "peao"; peca[7][6]['cor'] = "branco"; peca[7][6]['mov'] = 0;
     peca[7][7]['peca'] = "peao"; peca[7][7]['cor'] = "branco"; peca[7][7]['mov'] = 0;
     peca[7][8]['peca'] = "peao"; peca[7][8]['cor'] = "branco"; peca[7][8]['mov'] = 0;
-    console.log('peca: ', peca);
-    
 
     ///aray para movimentar as pecas
     movimenta = new Array();
@@ -160,7 +153,6 @@ function inicia_jogo() {
     movimenta['destino']['y'] = 0;
     movimenta['destino']['peca'] = "0";
     movimenta['destino']['cor'] = "0";
-    console.log('movimenta: ', movimenta);
     ///aray para os possiveis movimentos
     possiveis = new Array();
 }
@@ -214,7 +206,6 @@ function possiveis_movimentos() {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////CAVALO ////////////////////////////////
-
     if (peca[x][y]['peca'] == 'cavalo') {
         possivel(x - 1, y - 2);
         possivel(x + 1, y + 2);
@@ -270,7 +261,7 @@ function possiveis_movimentos() {
         if (px > 0 && px < 9 && py > 0 && py < 9 && peca[px][py]['cor'] != movimenta['selecionada']['cor']) {
             document.getElementById('t' + (px) + (py)).style.backgroundColor = "#3C9"; //muda cor de fundo
             possiveis[c] = "t" + (px) + (py); c++;
-            
+
             if (!peca[px][py]['peca']) {
                 return true;
             }
@@ -290,8 +281,6 @@ function volta_fundo() {
 }
 
 function verifica_possivel(x, y, c) {
-    console.log('verifica_possivel: ', x, y, c);
-    
     var pode = 0;
     var cp;
     var div = "t" + x + y;
@@ -316,12 +305,9 @@ function seleciona(x, y) {
             movimenta['selecionada']['y'] = y;  //recebe y selecionado
             movimenta['selecionada']['peca'] = peca[x][y]['peca']; //recebe a peca selecionada
             movimenta['selecionada']['cor'] = peca[x][y]['cor'];	//recebe a cor selecionada
-            console.log('movimenta seleciona 1: ', movimenta);
-            
-            cont_possiveis = possiveis_movimentos();
-            
-        }
 
+            cont_possiveis = possiveis_movimentos();
+        }
     } else if (verifica_possivel(x, y, cont_possiveis)) { //se for segundo clique e a cor da peca destino for diferente da selecionada
 
         if (peca[x][y]['peca'] == "rei") {
@@ -366,6 +352,12 @@ function seleciona(x, y) {
         volta_fundo(); //volta a cor de fundo normal
 
         if (vez == "branco") { vez = "preto"; } else { vez = "branco"; } //troca a vez
+        if (vez == "branco") { vezAdversaria = "branco" } else { vezAdversaria = "preto"; } //troca a vez adversaria
+
+        // verificar cheque e cheque-mate aqui
+        let estaEmCheque = esta_em_cheque(vez)
+
+        let posicaoDoRei = encontrarRei(vez);
     }
 }
 
@@ -381,6 +373,175 @@ function escolhecor_incio(cor) {
     document.getElementById('fundo').style.display = 'none';
     vez = cor;
 }
+
+function encontrarRei(cor) { // PARECE QUE FUNCIONA PERFEITAMENTE
+    for (let i = 1; i <= 8; i++) {
+        for (let j = 1; j <= 8; j++) {
+            if (peca[i][j]['peca'] == "rei" && peca[i][j]['cor'] == cor) {
+                return { x: i, y: j };
+            }
+        }
+    }
+}
+
+function esta_em_cheque(corRei) {
+    // Encontra a posição do rei do jogador de corRei
+    let posicaoRei = encontrarRei(corRei);
+    
+    if (!posicaoRei) {
+        return false; // Se o rei não for encontrado, não está em cheque
+    }
+    
+    // Verifica se alguma peça adversária pode atingir a posição do rei
+    for (let i = 1; i <= 8; i++) { // iterando sobre todas as linhas
+        for (let j = 1; j <= 8; j++) { // iterando sobre todas as colunas
+            if (peca[i][j]['cor'] !== corRei && peca[i][j]['peca']) { // se existe uma peça na div e se essa peça possui uma cor diferente da cor do rei que esta em cheque
+                const movimentosPossiveis = possiveis_movimentos_para(i, j);
+                
+                if (verifica_possivel_cheque(posicaoRei.x, posicaoRei.y, movimentosPossiveis)) {
+                    return true; // O rei está em cheque
+                }
+            }
+        }
+    }
+    return false; // O rei não está em cheque
+}
+
+function possiveis_movimentos_para(i, j) {
+    const movimentos = [];
+    const tipoPeca = peca[i][j]['peca'];
+    const corPeca = peca[i][j]['cor'];
+
+    // Função que adiciona uma posição à lista de movimentos possíveis
+    const adicionarMovimento = (px, py) => {
+        if (px > 0 && px < 9 && py > 0 && py < 9) {
+            if (peca[px][py]['cor'] != corPeca) {
+                movimentos.push({ x: px, y: py });
+            }
+            if (!peca[px][py]['peca']) {
+                return true; // Casa vazia, pode continuar
+            }
+        }
+        return false; // Casa fora do tabuleiro ou bloqueada
+    };
+
+    // Movimentos do peão
+    if (tipoPeca === 'peao') {
+        const direcao = corPeca === "branco" ? -1 : 1;
+        const linhaInicial = corPeca === "branco" ? 7 : 2;
+
+        if (!peca[i + direcao][j]['peca']) {
+            adicionarMovimento(i + direcao, j);
+        }
+        if (j - 1 > 0 && peca[i + direcao][j - 1]['peca']) {
+            adicionarMovimento(i + direcao, j - 1);
+        }
+        if (j + 1 < 9 && peca[i + direcao][j + 1]['peca']) {
+            adicionarMovimento(i + direcao, j + 1);
+        }
+        if (i === linhaInicial && !peca[i + direcao * 2][j]['peca'] && !peca[i + direcao][j]['peca']) {
+            adicionarMovimento(i + direcao * 2, j);
+        }
+    }
+
+    // Movimentos do cavalo
+    if (tipoPeca === 'cavalo') {
+        const movimentosCavalo = [
+            { dx: -1, dy: -2 }, { dx: 1, dy: 2 },
+            { dx: 1, dy: -2 }, { dx: -1, dy: 2 },
+            { dx: -2, dy: -1 }, { dx: 2, dy: 1 },
+            { dx: 2, dy: -1 }, { dx: -2, dy: 1 }
+        ];
+        movimentosCavalo.forEach(({ dx, dy }) => adicionarMovimento(i + dx, j + dy));
+    }
+
+    // Movimentos do rei
+    if (tipoPeca === 'rei') {
+        const movimentosRei = [
+            { dx: -1, dy: 0 }, { dx: 0, dy: -1 }, { dx: -1, dy: -1 },
+            { dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 },
+            { dx: -1, dy: 1 }, { dx: 1, dy: -1 }
+        ];
+        movimentosRei.forEach(({ dx, dy }) => adicionarMovimento(i + dx, j + dy));
+    }
+
+    // Movimentos da torre
+    if (tipoPeca === 'torre') {
+        for (let dx = -1; adicionarMovimento(i + dx, j); dx--);
+        for (let dx = 1; adicionarMovimento(i + dx, j); dx++);
+        for (let dy = -1; adicionarMovimento(i, j + dy); dy--);
+        for (let dy = 1; adicionarMovimento(i, j + dy); dy++);
+    }
+
+    // Movimentos do bispo
+    if (tipoPeca === 'bispo') {
+        for (let d = 1; adicionarMovimento(i - d, j - d); d++);
+        for (let d = 1; adicionarMovimento(i + d, j + d); d++);
+        for (let d = 1; adicionarMovimento(i - d, j + d); d++);
+        for (let d = 1; adicionarMovimento(i + d, j - d); d++);
+    }
+
+    // Movimentos da rainha
+    if (tipoPeca === 'rainha') {
+        for (let d = 1; adicionarMovimento(i - d, j - d); d++);
+        for (let d = 1; adicionarMovimento(i + d, j + d); d++);
+        for (let d = 1; adicionarMovimento(i - d, j + d); d++);
+        for (let d = 1; adicionarMovimento(i + d, j - d); d++);
+        for (let d = 1; adicionarMovimento(i - d, j); d++);
+        for (let d = 1; adicionarMovimento(i + d, j); d++);
+        for (let d = 1; adicionarMovimento(i, j - d); d++);
+        for (let d = 1; adicionarMovimento(i, j + d); d++);
+    }
+
+    return movimentos; // Retorna todos os movimentos possíveis
+}
+
+function verifica_possivel_cheque(posicaoX, posicaoY, movimentosPossiveis) {
+    // Concatena as coordenadas do rei em uma string, no mesmo formato das posições dos movimentos
+    const posicaoRei = "t" + posicaoX + posicaoY;
+
+    // Itera pelos movimentos possíveis da peça adversária
+    for (let i = 0; i < movimentosPossiveis.length; i++) {
+        // Se algum dos movimentos possíveis coincide com a posição do rei
+        const movimentoAtual = "t" + movimentosPossiveis[i].x + movimentosPossiveis[i].y;
+        
+        if (movimentoAtual === posicaoRei) {
+            return true; // O rei está sob ataque
+        }
+    }
+
+    // Se nenhum movimento atingir a posição do rei, o rei não está em cheque
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -399,6 +560,7 @@ function escolhecor_incio(cor) {
 
 
 /*
+
 function possiveis_movimentos() {
     var x, y;
     let c = 0; //contador pro array possiveis
@@ -806,6 +968,7 @@ function esta_em_cheque(corRei) {
     }
     return false; // O rei não está em cheque
 }
+
 function esta_em_xeque_mate(corRei) {
     // Verifica se o rei da cor especificada está em cheque
     if (!esta_em_cheque(corRei)) {
