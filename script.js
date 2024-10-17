@@ -38,43 +38,8 @@ function inicia_jogo() {
     vez = "branco"; //vez de quem jogar
     vezAdversaria = "preto"
 
-    //muda a classe das pecas pretas(encima) para mostrar imgens das pecas
-    document.getElementById("t11").innerHTML = "&#9820;";
-    document.getElementById("t12").innerHTML = "&#9822;";
-    document.getElementById("t13").innerHTML = "&#9821;";
-    document.getElementById("t14").innerHTML = "&#9819;";
-    document.getElementById("t15").innerHTML = "&#9818;";
-    document.getElementById("t16").innerHTML = "&#9821;";
-    document.getElementById("t17").innerHTML = "&#9822;";
-    document.getElementById("t18").innerHTML = "&#9820;";
-
-    document.getElementById("t21").innerHTML = "&#9823;";
-    document.getElementById("t22").innerHTML = "&#9823;";
-    document.getElementById("t23").innerHTML = "&#9823;";
-    document.getElementById("t24").innerHTML = "&#9823;";
-    document.getElementById("t25").innerHTML = "&#9823;";
-    document.getElementById("t26").innerHTML = "&#9823;";
-    document.getElementById("t27").innerHTML = "&#9823;";
-    document.getElementById("t28").innerHTML = "&#9823;";
-
-    //muda a classe das pecas brancas(embaixo) para mostrar imgens das pecas
-    document.getElementById("t81").innerHTML = "&#9814;";
-    document.getElementById("t82").innerHTML = "&#9816;";
-    document.getElementById("t83").innerHTML = "&#9815;";
-    document.getElementById("t84").innerHTML = "&#9813;";
-    document.getElementById("t85").innerHTML = "&#9812;";
-    document.getElementById("t86").innerHTML = "&#9815;";
-    document.getElementById("t87").innerHTML = "&#9816;";
-    document.getElementById("t88").innerHTML = "&#9814;";
-
-    document.getElementById("t71").innerHTML = "&#9817;";
-    document.getElementById("t72").innerHTML = "&#9817;";
-    document.getElementById("t73").innerHTML = "&#9817;";
-    document.getElementById("t74").innerHTML = "&#9817;";
-    document.getElementById("t75").innerHTML = "&#9817;";
-    document.getElementById("t76").innerHTML = "&#9817;";
-    document.getElementById("t77").innerHTML = "&#9817;";
-    document.getElementById("t78").innerHTML = "&#9817;";
+    zerarCasas()
+    popularCasas()
 
     //cria array que var receber as posicoes do tabuleiro
     cria_array();
@@ -353,7 +318,7 @@ function seleciona(x, y) {
         volta_fundo(); //volta a cor de fundo normal
 
         if (vez == "branco") { vez = "preto"; } else { vez = "branco"; } //troca a vez
-        if (vez == "branco") { vezAdversaria = "branco" } else { vezAdversaria = "preto"; } //troca a vez adversaria
+        if (vez == "preto") { vezAdversaria = "branco" } else { vezAdversaria = "preto"; } //troca a vez adversaria
 
         // verificar cheque e cheque-mate aqui
         let estaEmCheque = esta_em_cheque(vez)
@@ -382,6 +347,7 @@ function verifica_cheque_mate() {
 
             // Verifica se a peça pertence ao jogador que está em cheque
             if (pecaAtual['cor'] === vez) {
+
                 // Obtém os movimentos possíveis para a peça atual
                 let movimentos = possiveis_movimentos_para_peca(x, y);
 
@@ -411,13 +377,11 @@ function verifica_cheque_mate() {
 
     // Se não há movimentos que removem o cheque, então é cheque-mate
     if (movimentosPossiveis.length === 0) {
-        alert("Cheque-mate! O jogador " + vezAdversaria + " venceu!");
         return true; // Cheque-mate
     }
 
     return false; // Não é cheque-mate
 }
-
 
 function escolhe(pecae, core) {
     peca[xe][ye]['peca'] = pecae;
@@ -578,6 +542,211 @@ function verifica_possivel_cheque(posicaoX, posicaoY, movimentosPossiveis) {
 
 
 
+function possiveis_movimentos_para_peca(x, y) {
+    let pecaAtual = peca[x][y]['peca'];
+    let corAtual = peca[x][y]['cor'];
+    let movimentos = [];
+
+    switch (pecaAtual) {
+        case "peao":
+            movimentos = movimentos_peao(x, y, corAtual);
+            break;
+        case "torre":
+            movimentos = movimentos_torre(x, y, corAtual);
+            break;
+        case "cavalo":
+            movimentos = movimentos_cavalo(x, y, corAtual);
+            break;
+        case "bispo":
+            movimentos = movimentos_bispo(x, y, corAtual);
+            break;
+        case "rainha":
+            movimentos = movimentos_rainha(x, y, corAtual);
+            break;
+        case "rei":
+            movimentos = movimentos_rei(x, y, corAtual);
+            break;
+        default:
+            break;
+    }
+
+    return movimentos;
+}
+
+function desfaz_movimento(movimentoFeito) {
+    console.log('movimentoFeito: ', movimentoFeito);
+
+    // Restaura o estado da peça na posição de origem
+    let xDestino = movimentoFeito.xDestino;
+    let yDestino = movimentoFeito.yDestino;
+
+    // Restaura a peça original na origem e no destino
+    peca[movimentoFeito.xOrigem][movimentoFeito.yOrigem]['peca'] = peca[xDestino][yDestino]['peca'];
+    peca[movimentoFeito.xOrigem][movimentoFeito.yOrigem]['cor'] = peca[xDestino][yDestino]['cor'];
+    peca[xDestino][yDestino]['peca'] = movimentoFeito.pecaDestino;
+    peca[xDestino][yDestino]['cor'] = movimentoFeito.corDestino;
+}
+function simula_movimento(xOrigem, yOrigem, xDestino, yDestino) {
+    // Armazena as informações do movimento
+    let movimentoFeito = {
+        xOrigem: xOrigem,
+        yOrigem: yOrigem,
+        xDestino: xDestino,
+        yDestino: yDestino,
+        pecaDestino: peca[xDestino][yDestino]['peca'],  // Captura a peça que está sendo "substituída"
+        corDestino: peca[xDestino][yDestino]['cor']     // Captura a cor da peça que está sendo "substituída"
+    };
+
+    // Executa a movimentação
+    peca[xDestino][yDestino]['peca'] = peca[xOrigem][yOrigem]['peca'];
+    peca[xDestino][yDestino]['cor'] = peca[xOrigem][yOrigem]['cor'];
+    peca[xOrigem][yOrigem]['peca'] = false; // ou o valor padrão que você usa
+    peca[xOrigem][yOrigem]['cor'] = false;
+
+    // Retorna o objeto que armazena o movimento
+    return movimentoFeito;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function movimentos_peao(x, y, corPeca) {
+    var movimentos = [];
+    if (corPeca == "branco") {
+        if (!peca[x - 1][y]['peca']) {
+            movimentos.push([x - 1, y]);
+        }
+        if (y - 1 > 0 && peca[x - 1][y - 1]['peca']) {
+            movimentos.push([x - 1, y - 1]);
+        }
+        if (y + 1 < 9 && peca[x - 1][y + 1]['peca']) {
+            movimentos.push([x - 1, y + 1]);
+        }
+        if (x == 7 && !peca[x - 2][y]['peca'] && !peca[x - 1][y]['peca']) {
+            movimentos.push([x - 2, y]);
+        }
+    } else if (corPeca == "preto") {
+        if (!peca[x + 1][y]['peca']) {
+            movimentos.push([x + 1, y]);
+        }
+        if (y - 1 > 0 && peca[x + 1][y - 1]['peca']) {
+            movimentos.push([x + 1, y - 1]);
+        }
+        if (y + 1 < 9 && peca[x + 1][y + 1]['peca']) {
+            movimentos.push([x + 1, y + 1]);
+        }
+        if (x == 2 && !peca[x + 2][y]['peca'] && !peca[x + 1][y]['peca']) {
+            movimentos.push([x + 2, y]);
+        }
+    }
+    return movimentos.filter(m => m); // Retorna somente movimentos válidos
+}
+function movimentos_cavalo(x, y, corPeca) {
+    var movimentos = [];
+    movimentos.push([x - 1, y - 2]);
+    movimentos.push([x + 1, y + 2]);
+    movimentos.push([x + 1, y - 2]);
+    movimentos.push([x - 1, y + 2]);
+    movimentos.push([x - 2, y - 1]);
+    movimentos.push([x + 2, y + 1]);
+    movimentos.push([x + 2, y - 1]);
+    movimentos.push([x - 2, y + 1]);
+    return movimentos.filter(m => dentroLimite(m[0], m[1]) && (!peca[m[0]][m[1]]['peca'] || peca[m[0]][m[1]]['cor'] !== corPeca));
+}
+function movimentos_rei(x, y, corPeca) {
+    var movimentos = [];
+    movimentos.push([x - 1, y]);
+    movimentos.push([x, y - 1]);
+    movimentos.push([x - 1, y - 1]);
+    movimentos.push([x + 1, y]);
+    movimentos.push([x, y + 1]);
+    movimentos.push([x + 1, y + 1]);
+    movimentos.push([x - 1, y + 1]);
+    movimentos.push([x + 1, y - 1]);
+    return movimentos.filter(m => dentroLimite(m[0], m[1]) && (!peca[m[0]][m[1]]['peca'] || peca[m[0]][m[1]]['cor'] !== corPeca));
+}
+function movimentos_torre(x, y, corPeca) {
+    var movimentos = [];
+    for (var i = 1; dentroLimite(x - i, y) && !peca[x - i][y]['peca']; i++) {
+        movimentos.push([x - i, y]);
+    }
+    if (dentroLimite(x - i, y) && peca[x - i][y]['cor'] !== corPeca) {
+        movimentos.push([x - i, y]);
+    }
+
+    for (var i = 1; dentroLimite(x + i, y) && !peca[x + i][y]['peca']; i++) {
+        movimentos.push([x + i, y]);
+    }
+    if (dentroLimite(x + i, y) && peca[x + i][y]['cor'] !== corPeca) {
+        movimentos.push([x + i, y]);
+    }
+
+    for (var i = 1; dentroLimite(x, y - i) && !peca[x][y - i]['peca']; i++) {
+        movimentos.push([x, y - i]);
+    }
+    if (dentroLimite(x, y - i) && peca[x][y - i]['cor'] !== corPeca) {
+        movimentos.push([x, y - i]);
+    }
+
+    for (var i = 1; dentroLimite(x, y + i) && !peca[x][y + i]['peca']; i++) {
+        movimentos.push([x, y + i]);
+    }
+    if (dentroLimite(x, y + i) && peca[x][y + i]['cor'] !== corPeca) {
+        movimentos.push([x, y + i]);
+    }
+
+    return movimentos.filter(m => m);
+}
+function movimentos_bispo(x, y, corPeca) {
+    var movimentos = [];
+    for (var i = 1; dentroLimite(x - i, y - i) && !peca[x - i][y - i]['peca']; i++) {
+        movimentos.push([x - i, y - i]);
+    }
+    if (dentroLimite(x - i, y - i) && peca[x - i][y - i]['cor'] !== corPeca) {
+        movimentos.push([x - i, y - i]);
+    }
+
+    for (var i = 1; dentroLimite(x + i, y + i) && !peca[x + i][y + i]['peca']; i++) {
+        movimentos.push([x + i, y + i]);
+    }
+    if (dentroLimite(x + i, y + i) && peca[x + i][y + i]['cor'] !== corPeca) {
+        movimentos.push([x + i, y + i]);
+    }
+
+    for (var i = 1; dentroLimite(x - i, y + i) && !peca[x - i][y + i]['peca']; i++) {
+        movimentos.push([x - i, y + i]);
+    }
+    if (dentroLimite(x - i, y + i) && peca[x - i][y + i]['cor'] !== corPeca) {
+        movimentos.push([x - i, y + i]);
+    }
+
+    for (var i = 1; dentroLimite(x + i, y - i) && !peca[x + i][y - i]['peca']; i++) {
+        movimentos.push([x + i, y - i]);
+    }
+    if (dentroLimite(x + i, y - i) && peca[x + i][y - i]['cor'] !== corPeca) {
+        movimentos.push([x + i, y - i]);
+    }
+
+    return movimentos.filter(m => m);
+}
+function movimentos_rainha(x, y, corPeca) {
+    return [...movimentos_torre(x, y, corPeca), ...movimentos_bispo(x, y, corPeca)];
+}
+
+function dentroLimite(x, y) {
+    return x >= 1 && x <= 8 && y >= 1 && y <= 8; // Verifica se x e y estão entre 1 e 8
+}
 
 
 
@@ -605,16 +774,57 @@ function verifica_possivel_cheque(posicaoX, posicaoY, movimentosPossiveis) {
 
 
 
+function zerarCasas() {
+    let casasBrancas = document.querySelectorAll('.casaTabuleiroBranca')
+    let casasPretas = document.querySelectorAll('.casaTabuleiroPreta')
 
+    Array.from(casasBrancas).forEach(casaBranca => {
+        casaBranca.innerHTML = "";
+    })
+    Array.from(casasPretas).forEach(casaPreta => {
+        casaPreta.innerHTML = "";
+    })
+}
 
+function popularCasas() {
+    //muda a classe das pecas pretas(encima) para mostrar imgens das pecas
+    document.getElementById("t11").innerHTML = "&#9820;";
+    document.getElementById("t12").innerHTML = "&#9822;";
+    document.getElementById("t13").innerHTML = "&#9821;";
+    document.getElementById("t14").innerHTML = "&#9819;";
+    document.getElementById("t15").innerHTML = "&#9818;";
+    document.getElementById("t16").innerHTML = "&#9821;";
+    document.getElementById("t17").innerHTML = "&#9822;";
+    document.getElementById("t18").innerHTML = "&#9820;";
 
+    document.getElementById("t21").innerHTML = "&#9823;";
+    document.getElementById("t22").innerHTML = "&#9823;";
+    document.getElementById("t23").innerHTML = "&#9823;";
+    document.getElementById("t24").innerHTML = "&#9823;";
+    document.getElementById("t25").innerHTML = "&#9823;";
+    document.getElementById("t26").innerHTML = "&#9823;";
+    document.getElementById("t27").innerHTML = "&#9823;";
+    document.getElementById("t28").innerHTML = "&#9823;";
 
+    //muda a classe das pecas brancas(embaixo) para mostrar imgens das pecas
+    document.getElementById("t81").innerHTML = "&#9814;";
+    document.getElementById("t82").innerHTML = "&#9816;";
+    document.getElementById("t83").innerHTML = "&#9815;";
+    document.getElementById("t84").innerHTML = "&#9813;";
+    document.getElementById("t85").innerHTML = "&#9812;";
+    document.getElementById("t86").innerHTML = "&#9815;";
+    document.getElementById("t87").innerHTML = "&#9816;";
+    document.getElementById("t88").innerHTML = "&#9814;";
 
-
-
-
-
-
+    document.getElementById("t71").innerHTML = "&#9817;";
+    document.getElementById("t72").innerHTML = "&#9817;";
+    document.getElementById("t73").innerHTML = "&#9817;";
+    document.getElementById("t74").innerHTML = "&#9817;";
+    document.getElementById("t75").innerHTML = "&#9817;";
+    document.getElementById("t76").innerHTML = "&#9817;";
+    document.getElementById("t77").innerHTML = "&#9817;";
+    document.getElementById("t78").innerHTML = "&#9817;";
+}
 
 
 /*
