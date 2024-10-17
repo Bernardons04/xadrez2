@@ -8,7 +8,8 @@
             não, então é cheque mate
 
     1 - Detectar se o jogador 1 está em cheque, logo após a jogada do jogador 2, 
-        e para isso é necessário verificar se alguma peça do jogador 1, está ameaçando o rei do jogador 2;
+        e para isso é necessário verificar se alguma peça do jogador 1, está ameaçando o rei do jogador 2;                  ESTÁ FEITOOOOOOOOOOOOOOO
+
         1.1. IMPLEMENTAÇÃO: Depois de cada movimento, fazer uma iteração por todas as peças do oponente do jogador 2, para verificar se alguma delas
             pode alcançar o rei do jogador 1, se sim,o rei do jogador 1 está em cheque, então TRUE deve ser retornado, caso contrario, FALSE deve ser retornado.
             1.1.1. Fazer mais uma verificação para ver se o movimento feito na simulação nao resulta em cheque de alguma outra forma;
