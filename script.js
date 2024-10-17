@@ -357,10 +357,67 @@ function seleciona(x, y) {
 
         // verificar cheque e cheque-mate aqui
         let estaEmCheque = esta_em_cheque(vez)
+        if (estaEmCheque) {
 
-        let posicaoDoRei = encontrarRei(vez);
+            let chequeMate = verifica_cheque_mate(vez);
+
+            if (chequeMate) {
+                alert("Cheque-mate! " + vezAdversaria + " venceu!");
+                inicia_jogo()
+            } else {
+                alert(vez + ' está em cheque');
+            }
+        }
+
     }
 }
+
+function verifica_cheque_mate() {
+    let movimentosPossiveis = []; // Lista para armazenar os movimentos possíveis que tiram o rei do cheque
+
+    // Itera sobre todas as peças no tabuleiro
+    for (let x = 1; x <= 8; x++) {
+        for (let y = 1; y <= 8; y++) {
+            let pecaAtual = peca[x][y];
+
+            // Verifica se a peça pertence ao jogador que está em cheque
+            if (pecaAtual['cor'] === vez) {
+                // Obtém os movimentos possíveis para a peça atual
+                let movimentos = possiveis_movimentos_para_peca(x, y);
+
+                // Para cada movimento possível, simula o movimento e verifica se tira o cheque
+                for (let i = 0; i < movimentos.length; i++) {
+                    let destinoX = movimentos[i][0];
+                    let destinoY = movimentos[i][1];
+
+                    // Simula o movimento da peça
+                    let movimentoFeito = simula_movimento(x, y, destinoX, destinoY);
+
+                    // Verifica se o movimento resultou em tirar o cheque
+                    if (!esta_em_cheque(vez)) {
+                        // Se tirou o cheque, adiciona o movimento à lista de movimentos possíveis
+                        movimentosPossiveis.push({
+                            de: [x, y],
+                            para: [destinoX, destinoY]
+                        });
+                    }
+
+                    // Reverte o movimento simulado
+                    desfaz_movimento(movimentoFeito);
+                }
+            }
+        }
+    }
+
+    // Se não há movimentos que removem o cheque, então é cheque-mate
+    if (movimentosPossiveis.length === 0) {
+        alert("Cheque-mate! O jogador " + vezAdversaria + " venceu!");
+        return true; // Cheque-mate
+    }
+
+    return false; // Não é cheque-mate
+}
+
 
 function escolhe(pecae, core) {
     peca[xe][ye]['peca'] = pecae;
@@ -388,17 +445,17 @@ function encontrarRei(cor) { // PARECE QUE FUNCIONA PERFEITAMENTE
 function esta_em_cheque(corRei) {
     // Encontra a posição do rei do jogador de corRei
     let posicaoRei = encontrarRei(corRei);
-    
+
     if (!posicaoRei) {
         return false; // Se o rei não for encontrado, não está em cheque
     }
-    
+
     // Verifica se alguma peça adversária pode atingir a posição do rei
     for (let i = 1; i <= 8; i++) { // iterando sobre todas as linhas
         for (let j = 1; j <= 8; j++) { // iterando sobre todas as colunas
             if (peca[i][j]['cor'] !== corRei && peca[i][j]['peca']) { // se existe uma peça na div e se essa peça possui uma cor diferente da cor do rei que esta em cheque
                 const movimentosPossiveis = possiveis_movimentos_para(i, j);
-                
+
                 if (verifica_possivel_cheque(posicaoRei.x, posicaoRei.y, movimentosPossiveis)) {
                     return true; // O rei está em cheque
                 }
@@ -505,7 +562,7 @@ function verifica_possivel_cheque(posicaoX, posicaoY, movimentosPossiveis) {
     for (let i = 0; i < movimentosPossiveis.length; i++) {
         // Se algum dos movimentos possíveis coincide com a posição do rei
         const movimentoAtual = "t" + movimentosPossiveis[i].x + movimentosPossiveis[i].y;
-        
+
         if (movimentoAtual === posicaoRei) {
             return true; // O rei está sob ataque
         }
