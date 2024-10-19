@@ -235,7 +235,7 @@ function possiveis_movimentos() {
             return false;
         }
     }
-
+    console.log('possiveis_movimentos return', c)
     return c;
 }
 
@@ -266,19 +266,35 @@ function seleciona(x, y) {
         if (movimenta['selecionada']['x'] != 0) {
             volta_fundo(); //volta a cor de fundo normal
         }
-        if (peca[x][y]['peca']) { //se tiver uma peca nessa posição
+        if (peca[x][y]['peca']) { //se tiver uma peça nessa posição
             movimenta['selecionada']['x'] = x;	//recebe x selecionado
             movimenta['selecionada']['y'] = y;  //recebe y selecionado
-            movimenta['selecionada']['peca'] = peca[x][y]['peca']; //recebe a peca selecionada
+            movimenta['selecionada']['peca'] = peca[x][y]['peca']; //recebe a peça selecionada
             movimenta['selecionada']['cor'] = peca[x][y]['cor'];	//recebe a cor selecionada
-
+    
+            // Chama o método verifica_cheque_mate para obter os movimentos que podem tirar o rei do cheque
+            let movimentosPossiveis = verifica_cheque_mate();
+    
+            // Filtra os movimentos possíveis da peça selecionada
+            let movimentosDaPecaSelecionada = movimentosPossiveis.filter(mov => 
+                mov.de[0] === movimenta['selecionada']['x'] && 
+                mov.de[1] === movimenta['selecionada']['y']
+            );
+    
+            // Se a peça selecionada não tiver movimentos válidos que tirem o rei do cheque, exibe uma mensagem
+            if (movimentosDaPecaSelecionada.length === 0) {
+                alert("Você está em cheque! Não pode mover essa peça.");
+                return; // Impede que o jogador faça o movimento
+            }
+    
+            // Se houver movimentos válidos, atualiza os possíveis movimentos para a peça selecionada
             cont_possiveis = possiveis_movimentos();
         }
     } else if (verifica_possivel(x, y, cont_possiveis)) { //se for segundo clique e a cor da peca destino for diferente da selecionada
-
-        if (peca[x][y]['peca'] == "rei") {
+        
+        /*if (peca[x][y]['peca'] == "rei") {
             alert(movimenta['selecionada']['cor'] + " venceu (:");
-        }
+        }*/
 
         //Pra trocar de peça quando o peão chegar do outro lado (PROMOVER PEAO)
         if (movimenta['selecionada']['peca'] == 'peao' && movimenta['selecionada']['cor'] == 'branco' && x == 1) {
@@ -325,10 +341,10 @@ function seleciona(x, y) {
         if (estaEmCheque) {
 
             let chequeMate = verifica_cheque_mate(vez);
-
+            console.log('chequeMate: ', chequeMate);
+            
             if (chequeMate) {
                 alert("Cheque-mate! " + vezAdversaria + " venceu!");
-                inicia_jogo()
             } else {
                 alert(vez + ' está em cheque');
             }
@@ -375,12 +391,7 @@ function verifica_cheque_mate() {
         }
     }
 
-    // Se não há movimentos que removem o cheque, então é cheque-mate
-    if (movimentosPossiveis.length === 0) {
-        return true; // Cheque-mate
-    }
-
-    return false; // Não é cheque-mate
+    return movimentosPossiveis;
 }
 
 function escolhe(pecae, core) {
@@ -536,12 +547,6 @@ function verifica_possivel_cheque(posicaoX, posicaoY, movimentosPossiveis) {
     return false;
 }
 
-
-
-
-
-
-
 function possiveis_movimentos_para_peca(x, y) {
     let pecaAtual = peca[x][y]['peca'];
     let corAtual = peca[x][y]['cor'];
@@ -574,7 +579,6 @@ function possiveis_movimentos_para_peca(x, y) {
 }
 
 function desfaz_movimento(movimentoFeito) {
-    console.log('movimentoFeito: ', movimentoFeito);
 
     // Restaura o estado da peça na posição de origem
     let xDestino = movimentoFeito.xDestino;
@@ -743,9 +747,26 @@ function movimentos_bispo(x, y, corPeca) {
 function movimentos_rainha(x, y, corPeca) {
     return [...movimentos_torre(x, y, corPeca), ...movimentos_bispo(x, y, corPeca)];
 }
-
 function dentroLimite(x, y) {
     return x >= 1 && x <= 8 && y >= 1 && y <= 8; // Verifica se x e y estão entre 1 e 8
+}
+function simularMovimentoEVerificarCheque(xOrigem, yOrigem, xDestino, yDestino, corRei) {
+    // Guardar o estado atual das peças
+    const pecaDestinoOriginal = peca[xDestino][yDestino];
+    const pecaOrigem = peca[xOrigem][yOrigem];
+    
+    // Simular o movimento
+    peca[xDestino][yDestino] = pecaOrigem;
+    peca[xOrigem][yOrigem] = { 'peca': false, 'cor': false };
+
+    // Verificar se o rei ainda está em cheque
+    const estaEmCheque = esta_em_cheque(corRei);
+
+    // Reverter o movimento
+    peca[xOrigem][yOrigem] = pecaOrigem;
+    peca[xDestino][yDestino] = pecaDestinoOriginal;
+
+    return !estaEmCheque; // Se o rei não está mais em cheque, o movimento é válido
 }
 
 
@@ -825,474 +846,3 @@ function popularCasas() {
     document.getElementById("t77").innerHTML = "&#9817;";
     document.getElementById("t78").innerHTML = "&#9817;";
 }
-
-
-/*
-
-function possiveis_movimentos() {
-    var x, y;
-    let c = 0; //contador pro array possiveis
-    var i; //contador pros for
-    x = movimenta['selecionada']['x'];
-    y = movimenta['selecionada']['y'];
-
-    document.getElementById('t' + x + y).style.backgroundColor = "#3C9"; //muda cor de fundo
-    possiveis[c] = "t" + x + y; c++;
-
-    ///////////////////////////////////////////////////////////////////////////////////PEAO////////////////////////////////
-    if (peca[x][y]['peca'] == 'peao') {
-        if (peca[x][y]['cor'] == "branco") {
-
-            if (!peca[x - 1][y]['peca']) {
-                possivel(x - 1, y);
-            } if (y - 1 > 0 && peca[x - 1][y - 1]['peca']) {
-                possivel(x - 1, y - 1);
-            }
-            if (y + 1 < 9 && peca[x - 1][y + 1]['peca']) {
-                possivel(x - 1, y + 1);
-            }
-
-            if (x == 7) {
-                if (!peca[x - 2][y]['peca'] && !peca[x - 1][y]['peca']) {
-                    possivel(x - 2, y);
-                }
-            }
-        }
-
-        if (peca[x][y]['cor'] == "preto") {
-            if (!peca[x + 1][y]['peca']) {
-                possivel(x + 1, y);
-            } if (y - 1 > 0 && peca[x + 1][y - 1]['peca']) {
-                possivel(x + 1, y - 1);
-            }
-            if (y + 1 < 9 && peca[x + 1][y + 1]['peca']) {
-                possivel(x + 1, y + 1);
-            }
-
-            if (x == 2) {
-                if (!peca[x + 2][y]['peca'] && !peca[x + 1][y]['peca']) {
-                    possivel(x + 2, y);
-                }
-            }
-        }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////CAVALO ////////////////////////////////
-
-    if (peca[x][y]['peca'] == 'cavalo') {
-        possivel(x - 1, y - 2);
-        possivel(x + 1, y + 2);
-        possivel(x + 1, y - 2);
-        possivel(x - 1, y + 2);
-        possivel(x - 2, y - 1);
-        possivel(x + 2, y + 1);
-        possivel(x + 2, y - 1);
-        possivel(x - 2, y + 1);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////REI ///////////////////////////////////
-    if (peca[x][y]['peca'] == 'rei') {
-        possivel(x - 1, y);
-        possivel(x, y - 1);
-        possivel(x - 1, y - 1);
-        possivel(x + 1, y);
-        possivel(x, y + 1);
-        possivel(x + 1, y + 1);
-        possivel(x - 1, y + 1);
-        possivel(x + 1, y - 1);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////TORRE ///////////////////////////////////
-    if (peca[x][y]['peca'] == 'torre') {
-        for (i = 1; possivel(x - i, y); i++);
-        for (i = 1; possivel(x + i, y); i++);
-        for (i = 1; possivel(x, y - i); i++);
-        for (i = 1; possivel(x, y + i); i++);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////BISPO ///////////////////////////////////
-    if (peca[x][y]['peca'] == 'bispo') {
-        for (i = 1; possivel(x - i, y - i); i++);
-        for (i = 1; possivel(x + i, y + i); i++);
-        for (i = 1; possivel(x - i, y + i); i++);
-        for (i = 1; possivel(x + i, y - i); i++);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////RAINHA ///////////////////////////////////
-    if (peca[x][y]['peca'] == 'rainha') {
-        for (i = 1; possivel(x - i, y - i); i++);
-        for (i = 1; possivel(x + i, y + i); i++);
-        for (i = 1; possivel(x - i, y + i); i++);
-        for (i = 1; possivel(x + i, y - i); i++);
-        for (i = 1; possivel(x - i, y); i++);
-        for (i = 1; possivel(x + i, y); i++);
-        for (i = 1; possivel(x, y - i); i++);
-        for (i = 1; possivel(x, y + i); i++);
-    }
-
-    function possivel(px, py) {
-        if (px > 0 && px < 9 && py > 0 && py < 9 && peca[px][py]['cor'] != movimenta['selecionada']['cor']) {
-            document.getElementById('t' + (px) + (py)).style.backgroundColor = "#3C9"; //muda cor de fundo
-            possiveis[c] = "t" + (px) + (py); c++;
-
-            if (!peca[px][py]['peca']) {
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    return c;
-}
-
-function volta_fundo() {
-    var cf;
-    for (cf = 0; cf < possiveis.length; cf++) {
-        document.getElementById(possiveis[cf]).style.backgroundColor = "";
-    }
-}
-
-function verifica_possivel(x, y, c) {
-    var pode = 0;
-    var cp;
-    var div = "t" + x + y;
-
-    for (cp = 1; cp < c; cp++) {
-
-        if (possiveis[cp] == div) {
-            pode++;
-        }
-        if (pode > 0) {
-            return 1;
-        }
-    }
-}
-
-function seleciona(x, y) {
-    if ((movimenta['selecionada']['x'] == 0 || peca[x][y]['cor'] == movimenta['selecionada']['cor']) && peca[x][y]['cor'] == vez) {
-        if (movimenta['selecionada']['x'] != 0) {
-            volta_fundo(); //volta a cor de fundo normal
-        }
-        if (peca[x][y]['peca']) { //se tiver uma peca nessa posição
-            movimenta['selecionada']['x'] = x;	//recebe x selecionado
-            movimenta['selecionada']['y'] = y;  //recebe y selecionado
-            movimenta['selecionada']['peca'] = peca[x][y]['peca']; //recebe a peca selecionada
-            movimenta['selecionada']['cor'] = peca[x][y]['cor'];	//recebe a cor selecionada
-
-            cont_possiveis = possiveis_movimentos();
-        }
-
-    } else if (verifica_possivel(x, y, cont_possiveis)) { //se for segundo clique e a cor da peca destino for diferente da selecionada
-
-        if (peca[x][y]['peca'] == "rei") {
-            alert(movimenta['selecionada']['cor'] + " venceu (:");
-
-        }
-
-        //Pra trocar de peça quando o peão chegar do outro lado
-        if (movimenta['selecionada']['peca'] == 'peao' && movimenta['selecionada']['cor'] == 'branco' && x == 1) {
-            document.getElementById('escolhebranco').style.display = 'block';
-            document.getElementById('fundo').style.display = 'block';
-            xe = x; ye = y;
-        }
-        if (movimenta['selecionada']['peca'] == 'peao' && movimenta['selecionada']['cor'] == 'preto' && x == 8) {
-            document.getElementById('escolhepreto').style.display = 'block';
-            document.getElementById('fundo').style.display = 'block';
-            xe = x; ye = y;
-        }
-
-        if (peca[x][y]['cor'] != movimenta['selecionada']['cor']) {
-            movimenta['destino']['x'] = x;	//recebe o x do destino(segundo clique)
-            movimenta['destino']['y'] = y;  //recebe y do destino(segundo clique)
-
-            if (peca[x][y]['peca']) {  //se tiver alguma peca nessa posição
-                movimenta['destino']['peca'] = peca[x][y]['peca'];	//destino recebe a peca selecionada
-                movimenta['destino']['cor'] = peca[x][y]['cor'];	//destino recebe a cor selecionada
-            }
-
-            document.getElementById("t" + movimenta['selecionada']['x'] + "" + movimenta['selecionada']['y']).innerHTML = ""; //selcionada fica sem imagem
-            document.getElementById("t" + x + "" + y).innerHTML = il[movimenta['selecionada']['cor']][movimenta['selecionada']['peca']]; //destino recebe a imagem da peça selecinada
-            peca[x][y]['peca'] = movimenta['selecionada']['peca'];	//posicao destino recebe a peca
-            peca[x][y]['cor'] = movimenta['selecionada']['cor'];		//posicao destino recebe a cor
-
-            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['peca'] = false;		//peca selecionada recebe 0
-            peca[movimenta['selecionada']['x']][movimenta['selecionada']['y']]['cor'] = false;		//cor selecionada recebe 0
-
-            movimenta['selecionada']['x'] = 0;	//selecionada x recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['y'] = 0;	//selecionada y recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['peca'] = "0";	//selecionada peca recebe 0 (pra na proxima ver q é o primeiro movimento)
-            movimenta['selecionada']['cor'] = "0";	//selecionada cor recebe 0 (pra na proxima ver q é o primeiro movimento)
-        }
-
-        volta_fundo(); //volta a cor de fundo normal
-
-        // Verifica se o adversário está em cheque
-        if (esta_em_cheque(vez == "branco" ? "preto" : "branco")) {
-            alert(vez + " colocou o adversário em cheque!");
-            
-            // Verifica se é xeque-mate
-            if (esta_em_xeque_mate(vez == "branco" ? "preto" : "branco")) {
-                alert(vez + " venceu por xeque-mate!");
-            } else {
-            }
-        }
-
-        if (vez == "branco") { vez = "preto"; } else { vez = "branco"; } //troca a vez
-
-    }
-}
-
-function escolhe(pecae, core) {
-    peca[xe][ye]['peca'] = pecae;
-    document.getElementById("t" + xe + "" + ye).innerHTML = il[core][pecae];
-    document.getElementById('escolhe' + core).style.display = 'none';
-    document.getElementById('fundo').style.display = 'none';
-}
-
-function escolhecor_incio(cor) {
-    document.getElementById('escolhecor-inicio').style.display = 'none';
-    document.getElementById('fundo').style.display = 'none';
-    vez = cor;
-}
-
-var ccccc = 0;
-
-function possivel2(px, py) {
-    if (px > 0 && px < 9 && py > 0 && py < 9 && peca[px][py]['cor'] != movimenta['selecionada']['cor']) {
-        possiveis[ccccc] = "t" + (px) + (py); ccccc++;
-
-        if (!peca[px][py]['peca']) {
-            return true;
-        }
-    } else {
-        return false;
-    }
-}
-
-function movimentos_peao(x, y) {
-    let movimentos = []; // Array para armazenar os movimentos
-
-    if (peca[x][y]['cor'] === "branco") {
-        if (!peca[x - 1][y]['peca']) {
-            movimentos.push({ x: x - 1, y: y });
-        }
-        if (y - 1 > 0 && peca[x - 1][y - 1]['peca']) {
-            movimentos.push({ x: x - 1, y: y - 1 });
-        }
-        if (y + 1 < 9 && peca[x - 1][y + 1]['peca']) {
-            movimentos.push({ x: x - 1, y: y + 1 });
-        }
-        if (x == 7 && !peca[x - 2][y]['peca'] && !peca[x - 1][y]['peca']) {
-            movimentos.push({ x: x - 2, y: y });
-        }
-    } else {
-        if (!peca[x + 1][y]['peca']) {
-            movimentos.push({ x: x + 1, y: y });
-        }
-        if (y - 1 > 0 && peca[x + 1][y - 1]['peca']) {
-            movimentos.push({ x: x + 1, y: y - 1 });
-        }
-        if (y + 1 < 9 && peca[x + 1][y + 1]['peca']) {
-            movimentos.push({ x: x + 1, y: y + 1 });
-        }
-        if (x == 2 && !peca[x + 2][y]['peca'] && !peca[x + 1][y]['peca']) {
-            movimentos.push({ x: x + 2, y: y });
-        }
-    }
-
-    return movimentos; // Retorna o array de movimentos possíveis
-}
-
-
-function movimentos_cavalo(x, y) {
-    possivel2(x - 1, y - 2);
-    possivel2(x + 1, y + 2);
-    possivel2(x + 1, y - 2);
-    possivel2(x - 1, y + 2);
-    possivel2(x - 2, y - 1);
-    possivel2(x + 2, y + 1);
-    possivel2(x + 2, y - 1);
-    possivel2(x - 2, y + 1);
-}
-
-function movimentos_rei(x, y) {
-    possivel2(x - 1, y);
-    possivel2(x, y - 1);
-    possivel2(x - 1, y - 1);
-    possivel2(x + 1, y);
-    possivel2(x, y + 1);
-    possivel2(x + 1, y + 1);
-    possivel2(x - 1, y + 1);
-    possivel2(x + 1, y - 1);
-}
-
-function movimentos_torre(x, y) {
-    for (let i = 1; possivel2(x - i, y); i++);
-    for (let i = 1; possivel2(x + i, y); i++);
-    for (let i = 1; possivel2(x, y - i); i++);
-    for (let i = 1; possivel2(x, y + i); i++);
-}
-
-function movimentos_bispo(x, y) {
-    for (let i = 1; possivel2(x - i, y - i); i++);
-    for (let i = 1; possivel2(x + i, y + i); i++);
-    for (let i = 1; possivel2(x - i, y + i); i++);
-    for (let i = 1; possivel2(x + i, y - i); i++);
-}
-
-function movimentos_rainha(x, y) {
-    movimentos_bispo(x, y); // A rainha pode mover-se como o bispo...
-    movimentos_torre(x, y); // ...e como a torre.
-}
-
-const movimentosPeca = {
-    peao: movimentos_peao,
-    cavalo: movimentos_cavalo,
-    torre: movimentos_torre,
-    bispo: movimentos_bispo,
-    rainha: movimentos_rainha,
-    rei: movimentos_rei,
-};
-
-function possiveis_movimentos_para(x, y) {
-    let movimentos = [];
-    let peca_selecionada = peca[x][y]['peca'];
-
-    if (movimentosPeca[peca_selecionada]) {
-        movimentos = movimentosPeca[peca_selecionada](x, y);
-    }
-
-    movimentos = filtrar_movimentos_que_deixam_em_cheque(movimentos);
-    return movimentos;
-}
-
-function filtrar_movimentos_que_deixam_em_cheque(movimentos) {
-    const movimentos_validos = [];
-
-    // Verifique se 'movimentos' é um array
-    if (!Array.isArray(movimentos)) {
-        return movimentos_validos; // Retorne um array vazio se 'movimentos' não for um array
-    }
-    
-    for (const movimento of movimentos) {
-        
-        // Verifica se 'movimento' tem as propriedades 'origem' e 'destino'
-        if (movimento.origem && movimento.destino) {
-            const origem = movimento.origem;
-            const destino = movimento.destino;
-
-            // Simular o movimento
-            const pecaMovida = peca[origem.x][origem.y];
-            const pecaCapturada = peca[destino.x][destino.y]; // Para restaurar depois
-
-            // Mover a peça
-            peca[destino.x][destino.y] = pecaMovida;
-            peca[origem.x][origem.y] = { peca: false, cor: false, mov: 0 }; // A posição original fica vazia
-
-            // Verificar se o rei do jogador está em cheque
-            if (!esta_em_cheque()) {
-                movimentos_validos.push(movimento); // Adiciona movimento válido
-            }
-
-            // Desfazer o movimento
-            peca[origem.x][origem.y] = pecaMovida; // Retorna a peça à posição original
-            peca[destino.x][destino.y] = pecaCapturada; // Restaura a peça capturada, se houver
-        } else {
-        }
-    }
-
-    return movimentos_validos;
-}
-
-function encontrarRei(cor) {
-    for (let i = 1; i <= 8; i++) {
-        for (let j = 1; j <= 8; j++) {
-            if (peca[i][j]['peca'] == "rei" && peca[i][j]['cor'] == cor) {
-                return { x: i, y: j };
-            }
-        }
-    }
-}
-
-function esta_em_cheque(corRei) {
-    // Encontra a posição do rei do jogador de corRei
-    let posicaoRei = encontrarRei(corRei);
-    
-    if (!posicaoRei) {
-        return false; // Se o rei não for encontrado, não está em cheque
-    }
-    
-    // Verifica se alguma peça adversária pode atingir a posição do rei
-    for (let i = 1; i <= 8; i++) {
-        for (let j = 1; j <= 8; j++) {
-            if (peca[i][j]['cor'] !== corRei && peca[i][j]['peca']) {
-                const movimentosPossiveis = possiveis_movimentos_para(i, j);
-                if (verifica_possivel(posicaoRei.x, posicaoRei.y, movimentosPossiveis)) {
-                    return true; // O rei está em cheque
-                }
-            }
-        }
-    }
-    return false; // O rei não está em cheque
-}
-
-function esta_em_xeque_mate(corRei) {
-    // Verifica se o rei da cor especificada está em cheque
-    if (!esta_em_cheque(corRei)) {
-        return false; // Não está em xeque, logo não pode ser xeque-mate
-    }
-
-    // Percorre todas as peças do jogador
-    for (let i = 1; i <= 8; i++) {
-        for (let j = 1; j <= 8; j++) {
-            if (peca[i][j]['cor'] == corRei) {
-                // Para cada peça do jogador, calcula os movimentos possíveis
-                let movimentos = possiveis_movimentos();
-
-                // Simula cada movimento para verificar se ele remove o xeque
-                for (let movimento of movimentos) {
-                    let xDestino = movimento.x;
-                    let yDestino = movimento.y;
-
-                    // Simula o movimento
-                    let pecaOriginal = simular_movimento(i, j, xDestino, yDestino);
-
-                    // Verifica se o rei ainda está em cheque após o movimento
-                    if (!esta_em_cheque(corRei)) {
-                        desfazer_movimento(i, j, xDestino, yDestino, pecaOriginal);
-                        return false; // Encontrou um movimento que tira o xeque, logo não é xeque-mate
-                    }
-
-                    // Desfaz o movimento
-                    desfazer_movimento(i, j, xDestino, yDestino, pecaOriginal);
-                }
-            }
-        }
-    }
-
-    // Se nenhum movimento tirar o rei do xeque, então é xeque-mate
-    return true;
-}
-
-function simular_movimento(xOrigem, yOrigem, xDestino, yDestino) {
-    // Armazena o estado atual da peça de destino (para poder desfazer)
-    let pecaDestino = peca[xDestino][yDestino];
-
-    // Move a peça da origem para o destino
-    peca[xDestino][yDestino] = peca[xOrigem][yOrigem];
-    peca[xOrigem][yOrigem] = { peca: false, cor: false };
-
-    return pecaDestino;
-}
-
-function desfazer_movimento(xOrigem, yOrigem, xDestino, yDestino, pecaOriginal) {
-    // Restaura a peça na origem
-    peca[xOrigem][yOrigem] = peca[xDestino][yDestino];
-
-    // Restaura a peça que estava no destino (se havia uma)
-    peca[xDestino][yDestino] = pecaOriginal;
-}
-    
-
-*/
