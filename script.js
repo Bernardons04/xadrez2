@@ -1,39 +1,5 @@
-/* Implementação da detecção de cheque e cheque-mate
-    Resumo:
-    O rei está em cheque?
-        não: ótimo, continue o jogo;
-
-        sim: ele pode fazer algo para sair do cheque?
-            sim: ótimo, continue o jogo;
-            não, então é cheque mate
-
-    1 - Detectar se o jogador 1 está em cheque, logo após a jogada do jogador 2, 
-        e para isso é necessário verificar se alguma peça do jogador 1, está ameaçando o rei do jogador 2;                  ESTÁ FEITOOOOOOOOOOOOOOO
-
-        1.1. IMPLEMENTAÇÃO: Depois de cada movimento, fazer uma iteração por todas as peças do oponente do jogador 2, para verificar se alguma delas
-            pode alcançar o rei do jogador 1, se sim,o rei do jogador 1 está em cheque, então TRUE deve ser retornado, caso contrario, FALSE deve ser retornado.
-            1.1.1. Fazer mais uma verificação para ver se o movimento feito na simulação nao resulta em cheque de alguma outra forma;
-
-    2. Caso o jogador 1 esteja em cheque, deve ser rodado um metodo para verificar se é cheque-mate;
-        2.1 IMPLEMENTAÇÃO: Iterar sobre todas as peças do jogador 1 (jogador em cheque) e fazer simulações para ver se algum dos movimentos resulta em ele sair do cheque.
-
-    3. Caso seja um simples cheque de fato:
-        3.1. Primeiro de tudo deve ser mostrado um alert avisando que determinado jogador está em cheque;
-        3.2. Depois disso, toda peça que o jogador em cheque selecionar, so mostrará alguma possível casa de movimento se isso significar o impedimento do cheque de alguma, 
-            como por exemplo: se o jogador em cheque for colocar uma peça entre o rei e a peça que está ameaçando o rei. Ou então se é possivel comer a peça que está ameaçando o rei, ou então simplesmente mover o rei;
-*/
-
-/* Implementação para fazer o jogador perder por cheque-mate
-    1 - É bem simples, caso algum jogador 1 esteja em cheque-mate, disparar um modal ou alert com uma mensagem de que o jogador 2
-        venceu e um botão que vai reiniciar a partida;
-
-    2 - Quando o botão for clicado, o tabuleiro deve ser reiniciado e a div para escolha de peça deve ser mostrada novamente 
-        para que uma nova partida possa ser iniciada;
-*/
-
 /* Detectar empate por afogamento */
 /* Captura en-passant */
-/* roque */
 
 hasBlackKingMoved = false;
 hasWhiteKingMoved = false;
