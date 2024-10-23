@@ -27,6 +27,15 @@
     <div onclick="escolhe('bispo','preto');">&#9821;</div>
   </div>
 
+  <div class="divAcoes">
+    <h3 id="vezDoJogador">Xadrez Sangrento</h3>
+    <button id="btnNovaPartida" class="pushable" onclick="comecar_nova_partida();">
+      <span class="shadow"></span>
+      <span class="edge"></span>
+      <span class="front"> Começar Nova Partida </span>
+    </button>
+  </div>
+
   <div id="tabuleiro">
     <div id="t11" class="casaTabuleiroBranca" onclick="seleciona(1,1);"></div>
     <div id="t12" class="casaTabuleiroPreta" onclick="seleciona(1,2);"></div>
@@ -99,7 +108,6 @@
     <div id="t86" class="casaTabuleiroBranca" onclick="seleciona(8,6);"></div>
     <div id="t87" class="casaTabuleiroPreta" onclick="seleciona(8,7);"></div>
     <div id="t88" class="casaTabuleiroBranca" onclick="seleciona(8,8);"></div>
-
   </div>
 
   <script src="script.js"></script>
